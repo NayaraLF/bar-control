@@ -53,10 +53,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser)
       if (firebaseUser) {
-        const docRef = doc(db, 'users', firebaseUser.uid)
-        const docSnap = await getDoc(docRef)
-        if (docSnap.exists()) {
-          setProfile(docSnap.data() as UserProfile)
+        try {
+          const docRef = doc(db, 'users', firebaseUser.uid)
+          const docSnap = await getDoc(docRef)
+          if (docSnap.exists()) {
+            setProfile(docSnap.data() as UserProfile)
+          } else {
+            setProfile(null)
+          }
+        } catch {
+          setProfile(null)
         }
       } else {
         setProfile(null)

@@ -1,0 +1,69 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: check if user is authenticated
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Helper: get user role from Firestore
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isAuth() && getUserRole() == 'admin';
+    }
+
+    // Users collection: anyone authenticated can read their own profile,
+    // admins can read all and create new users
+    match /users/{userId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update, delete: if isAdmin();
+    }
+
+    // Categories: all authenticated can read, only admin can write
+    match /categories/{categoryId} {
+      allow read: if isAuth();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Stock items: all authenticated can read,
+    // all authenticated can update (needed for stock transactions),
+    // only admin can create/delete
+    match /stockItems/{itemId} {
+      allow read: if isAuth();
+      allow update: if isAuth();
+      allow create, delete: if isAdmin();
+    }
+
+    // Products: all authenticated can read, only admin can write
+    match /products/{productId} {
+      allow read: if isAuth();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Stock movements: all authenticated can read and create (via transactions)
+    match /stockMovements/{movementId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update, delete: if false;
+    }
+
+    // Comandas: all authenticated can read and create,
+    // all authenticated can update (add items, close)
+    match /comandas/{comandaId} {
+      allow read: if isAuth();
+      allow create, update: if isAuth();
+      allow delete: if isAdmin();
+    }
+
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

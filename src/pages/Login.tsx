@@ -142,11 +142,8 @@ export default function Login() {
             </Button>
           </Box>
 
-          <Typography variant="body2" textAlign="center">
-            Não tem conta?{' '}
-            <Link component={RouterLink} to="/registro">
-              Criar conta
-            </Link>
+          <Typography variant="body2" textAlign="center" color="text.secondary">
+            Peça ao administrador para criar sua conta.
           </Typography>
         </CardContent>
       </Card>

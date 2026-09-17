@@ -36,3 +36,35 @@ export interface StockMovement {
   createdAt: Timestamp
   notes: string
 }
+
+export interface ComandaItem {
+  id: string
+  productId: string
+  productName: string
+  price: number
+  quantity: number
+  stockItemId: string
+  consumptionPerUnit: number
+}
+
+export type PaymentMethod = 'dinheiro' | 'pix' | 'debito' | 'credito'
+
+export interface Payment {
+  method: PaymentMethod
+  amount: number
+  received?: number
+  change?: number
+}
+
+export interface Comanda {
+  id: string
+  label: string
+  status: 'open' | 'closed'
+  items: ComandaItem[]
+  total: number
+  payments?: Payment[]
+  createdBy: string
+  createdAt: Timestamp
+  closedBy?: string
+  closedAt?: Timestamp
+}

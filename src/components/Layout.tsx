@@ -30,10 +30,12 @@ import {
   History,
   AccountCircle,
   Logout,
+  People,
   Menu as MenuIcon,
 } from '@mui/icons-material'
 import { useAuth } from '../contexts/AuthContext'
 import { useThemeMode } from '../contexts/ThemeContext'
+import StockAlerts from './StockAlerts'
 
 const navItems = [
   { label: 'Comandas', icon: <Receipt />, path: '/' },
@@ -58,7 +60,12 @@ export default function Layout() {
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
-  const currentNav = navItems.findIndex((item) => item.path === location.pathname)
+  const currentNav = (() => {
+    const p = location.pathname
+    if (p === '/estoque') return 1
+    if (p === '/historico') return 2
+    return 0
+  })()
 
   async function handleSignOut() {
     setMenuAnchor(null)
@@ -107,6 +114,19 @@ export default function Layout() {
               />
             </Box>
             <Divider />
+            {profile?.role === 'admin' && (
+              <MenuItem
+                onClick={() => {
+                  setMenuAnchor(null)
+                  navigate('/usuarios')
+                }}
+              >
+                <ListItemIcon>
+                  <People fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Usuários</ListItemText>
+              </MenuItem>
+            )}
             <MenuItem onClick={handleSignOut}>
               <ListItemIcon>
                 <Logout fontSize="small" />
@@ -160,6 +180,7 @@ export default function Layout() {
           width: '100%',
         }}
       >
+        <StockAlerts />
         <Outlet />
       </Box>
 
