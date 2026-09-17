@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
   Card,
@@ -26,6 +27,7 @@ const menuItems = [
     icon: Receipt,
     color: '#1565C0',
     path: '/comandas',
+    ready: false,
   },
   {
     title: 'Estoque',
@@ -33,6 +35,7 @@ const menuItems = [
     icon: Inventory,
     color: '#2E7D32',
     path: '/estoque',
+    ready: true,
   },
   {
     title: 'Histórico',
@@ -40,11 +43,13 @@ const menuItems = [
     icon: History,
     color: '#E65100',
     path: '/historico',
+    ready: false,
   },
 ]
 
 export default function Dashboard() {
   const { profile } = useAuth()
+  const navigate = useNavigate()
 
   return (
     <Box>
@@ -74,7 +79,10 @@ export default function Dashboard() {
       >
         {menuItems.map((item) => (
           <Card key={item.title}>
-            <CardActionArea sx={{ p: 1 }}>
+            <CardActionArea
+              sx={{ p: 1 }}
+              onClick={() => item.ready && navigate(item.path)}
+            >
               <CardContent sx={{ textAlign: 'center' }}>
                 <item.icon
                   sx={{ fontSize: 48, color: item.color, mb: 1 }}
@@ -85,12 +93,14 @@ export default function Dashboard() {
                 <Typography variant="body2" color="text.secondary">
                   {item.description}
                 </Typography>
-                <Chip
-                  label="Em breve"
-                  size="small"
-                  sx={{ mt: 1 }}
-                  variant="outlined"
-                />
+                {!item.ready && (
+                  <Chip
+                    label="Em breve"
+                    size="small"
+                    sx={{ mt: 1 }}
+                    variant="outlined"
+                  />
+                )}
               </CardContent>
             </CardActionArea>
           </Card>
