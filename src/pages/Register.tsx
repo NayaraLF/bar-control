@@ -67,8 +67,10 @@ export default function Register() {
         setError('Este e-mail já está cadastrado')
       } else if (code === 'auth/weak-password') {
         setError('A senha precisa ter pelo menos 6 caracteres')
+      } else if (code === 'auth/operation-not-allowed') {
+        setError('Login por e-mail não está ativado no Firebase. Ative em Authentication > Sign-in method.')
       } else {
-        setError('Erro ao criar conta. Verifique sua conexão.')
+        setError(`Erro ao criar conta (${code ?? 'desconhecido'}). Verifique sua conexão.`)
       }
     } finally {
       setLoading(false)
