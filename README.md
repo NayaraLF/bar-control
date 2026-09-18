@@ -128,16 +128,7 @@ npm install
 
 ### Variáveis de Ambiente
 
-Crie um arquivo `.env` na raiz do projeto:
-
-```env
-VITE_FIREBASE_API_KEY=sua-api-key
-VITE_FIREBASE_AUTH_DOMAIN=seu-projeto.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=seu-projeto
-VITE_FIREBASE_STORAGE_BUCKET=seu-projeto.firebasestorage.app
-VITE_FIREBASE_MESSAGING_SENDER_ID=000000000000
-VITE_FIREBASE_APP_ID=0:000000000000:web:xxxxxxxxxx
-```
+Crie um arquivo `.env` na raiz do projeto com as credenciais do seu projeto Firebase. Consulte a [documentação do Firebase](https://firebase.google.com/docs/web/setup) para obter as chaves de configuração.
 
 ### Executar
 
