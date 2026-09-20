@@ -2,6 +2,8 @@
 
 Sistema de gestão para bares e restaurantes com controle de comandas, estoque e pagamentos em tempo real.
 
+**Acesse:** [barcontrol-80c33.web.app](https://barcontrol-80c33.web.app)
+
 ## Funcionalidades
 
 ### Comandas
@@ -73,6 +75,7 @@ Sistema de gestão para bares e restaurantes com controle de comandas, estoque e
 | Backend/DB | Firebase Firestore | 11 |
 | Autenticação | Firebase Auth | 11 |
 | Estilização | Emotion | 11 |
+| Hosting | Firebase Hosting | — |
 
 ## Estrutura do Projeto
 
@@ -140,6 +143,15 @@ npm run dev
 
 ```bash
 npm run build
+```
+
+### Deploy
+
+O app é hospedado no Firebase Hosting. Para fazer o deploy:
+
+```bash
+npm run build
+npx firebase-tools deploy --only hosting --project barcontrol-80c33
 ```
 
 ### Primeiro Acesso
