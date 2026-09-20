@@ -191,7 +191,7 @@ export default function Layout() {
           elevation={8}
         >
           <BottomNavigation
-            value={currentNav === -1 ? 0 : currentNav}
+            value={currentNav}
             onChange={(_, newValue) => {
               navigate(navItems[newValue].path)
             }}

@@ -36,7 +36,7 @@ import {
 import { db } from '../services/firebase'
 import { useAuth } from '../contexts/AuthContext'
 import { useCollection } from '../hooks/useFirestore'
-import { formatCurrency, unitLabels } from '../utils/format'
+import { formatCurrency } from '../utils/format'
 import type { Comanda, Product, StockItem, Category, ComandaItem } from '../types'
 
 function generateId() {
