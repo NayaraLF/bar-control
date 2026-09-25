@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import {
   AppBar,
@@ -36,6 +36,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useThemeMode } from '../contexts/ThemeContext'
 import StockAlerts from './StockAlerts'
 import { LogoIcon } from './Logo'
+import PageLoader from './PageLoader'
 
 const navItems = [
   { label: 'Comandas', icon: <Receipt />, path: '/' },
@@ -189,7 +190,9 @@ export default function Layout() {
         }}
       >
         <StockAlerts />
-        <Outlet />
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
       </Box>
 
       {/* Navegação inferior no celular */}
