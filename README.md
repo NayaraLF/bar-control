@@ -1,4 +1,4 @@
-# BarControl
+# Sobrado's Bar Gestão
 
 Sistema de gestão para bares e restaurantes com controle de comandas, estoque e pagamentos em tempo real.
 

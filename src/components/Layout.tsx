@@ -22,7 +22,6 @@ import {
   Chip,
 } from '@mui/material'
 import {
-  LocalBar,
   DarkMode,
   LightMode,
   Receipt,
@@ -36,6 +35,7 @@ import {
 import { useAuth } from '../contexts/AuthContext'
 import { useThemeMode } from '../contexts/ThemeContext'
 import StockAlerts from './StockAlerts'
+import { LogoIcon } from './Logo'
 
 const navItems = [
   { label: 'Comandas', icon: <Receipt />, path: '/' },
@@ -87,9 +87,17 @@ export default function Layout() {
               <MenuIcon />
             </IconButton>
           )}
-          <LocalBar sx={{ mr: 1 }} />
-          <Typography variant="h6" fontWeight={700} sx={{ flexGrow: 1 }}>
-            BarControl
+          <Box sx={{ mr: 1.25, display: 'flex' }}>
+            <LogoIcon size={34} glow={mode === 'dark'} />
+          </Box>
+          <Typography variant="h6" fontWeight={700} noWrap sx={{ flexGrow: 1 }}>
+            Sobrado’s
+            <Box
+              component="span"
+              sx={{ display: { xs: 'none', sm: 'inline' }, fontWeight: 500, opacity: 0.8 }}
+            >
+              {' '}Bar Gestão
+            </Box>
           </Typography>
           <IconButton color="inherit" onClick={toggleTheme} sx={{ mr: 1 }}>
             {mode === 'dark' ? <LightMode /> : <DarkMode />}
@@ -144,9 +152,9 @@ export default function Layout() {
       >
         <Box sx={{ width: 250, pt: 2 }}>
           <Box sx={{ px: 2, pb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <LocalBar color="secondary" />
+            <LogoIcon size={32} />
             <Typography variant="h6" fontWeight={700}>
-              BarControl
+              Sobrado’s
             </Typography>
           </Box>
           <Divider />

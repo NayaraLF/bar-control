@@ -17,12 +17,12 @@ import {
 import {
   Visibility,
   VisibilityOff,
-  LocalBar,
   DarkMode,
   LightMode,
 } from '@mui/icons-material'
 import { useAuth, type UserRole } from '../contexts/AuthContext'
 import { useThemeMode } from '../contexts/ThemeContext'
+import { LogoIcon } from '../components/Logo'
 
 const roles: { value: UserRole; label: string }[] = [
   { value: 'garcom', label: 'Garçom' },
@@ -95,7 +95,9 @@ export default function Register() {
       </Box>
 
       <Box sx={{ textAlign: 'center', mb: 3 }}>
-        <LocalBar sx={{ fontSize: 48, color: 'secondary.main', mb: 1 }} />
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1.5 }}>
+          <LogoIcon size={64} glow={mode === 'dark'} />
+        </Box>
         <Typography variant="h5" fontWeight={700}>
           Criar Conta
         </Typography>

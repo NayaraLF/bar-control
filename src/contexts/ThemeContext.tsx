@@ -9,8 +9,12 @@ interface ThemeContextType {
   toggleTheme: () => void
 }
 
+const STORAGE_KEY = 'sobrados-theme'
+// chave usada quando o app se chamava BarControl
+const LEGACY_STORAGE_KEY = 'barcontrol-theme'
+
 const ThemeContext = createContext<ThemeContextType>({
-  mode: 'light',
+  mode: 'dark',
   toggleTheme: () => {},
 })
 
@@ -20,10 +24,10 @@ export function useThemeMode() {
 
 function getSavedMode(): ThemeMode {
   try {
-    const saved = localStorage.getItem('barcontrol-theme')
+    const saved = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY)
     if (saved === 'dark' || saved === 'light') return saved
   } catch { /* localStorage indisponível */ }
-  return 'light'
+  return 'dark'
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -31,7 +35,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      localStorage.setItem('barcontrol-theme', mode)
+      localStorage.setItem(STORAGE_KEY, mode)
     } catch { /* ignora */ }
   }, [mode])
 

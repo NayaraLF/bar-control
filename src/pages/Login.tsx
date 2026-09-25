@@ -15,12 +15,12 @@ import {
 import {
   Visibility,
   VisibilityOff,
-  LocalBar,
   DarkMode,
   LightMode,
 } from '@mui/icons-material'
 import { useAuth } from '../contexts/AuthContext'
 import { useThemeMode } from '../contexts/ThemeContext'
+import { LogoIcon, Wordmark } from '../components/Logo'
 
 export default function Login() {
   const { signIn } = useAuth()
@@ -71,14 +71,9 @@ export default function Login() {
         </IconButton>
       </Box>
 
-      <Box sx={{ textAlign: 'center', mb: 3 }}>
-        <LocalBar sx={{ fontSize: 56, color: 'secondary.main', mb: 1 }} />
-        <Typography variant="h4" fontWeight={700}>
-          BarControl
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Sistema de Gestão para Bar
-        </Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, mb: 4 }}>
+        <LogoIcon size={96} glow={mode === 'dark'} />
+        <Wordmark glow={mode === 'dark'} />
       </Box>
 
       <Card sx={{ width: '100%', maxWidth: 400 }}>

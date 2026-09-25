@@ -1,4 +1,4 @@
-# BarControl — Regras de Negócio
+# Sobrado's Bar Gestão — Regras de Negócio
 
 Sistema de gestão para bar com dois módulos: Comandas e Estoque.
 Interface em português do Brasil, valores em R$ (formato 1.234,56).

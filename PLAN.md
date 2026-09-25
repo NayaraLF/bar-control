@@ -1,4 +1,4 @@
-# BarControl — Plano do Projeto
+# Sobrado's Bar Gestão — Plano do Projeto
 
 ## Tecnologias
 
