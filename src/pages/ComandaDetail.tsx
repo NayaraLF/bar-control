@@ -19,10 +19,6 @@ import {
   Chip,
   InputAdornment,
   MenuItem,
-  DialogActions,
-  DialogContentText,
-  FormControlLabel,
-  Checkbox,
 } from '@mui/material'
 import {
   ArrowBack,
@@ -42,6 +38,7 @@ import { db } from '../services/firebase'
 import { useAuth } from '../contexts/AuthContext'
 import { useCollection } from '../hooks/useFirestore'
 import { formatCurrency } from '../utils/format'
+import CancelComandaDialog, { canCancelComanda } from '../components/CancelComandaDialog'
 import type { Comanda, Product, StockItem, Category, ComandaItem } from '../types'
 
 function generateId() {
@@ -64,10 +61,8 @@ export default function ComandaDetail() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
-  const [returnStock, setReturnStock] = useState(true)
-  const [cancelReason, setCancelReason] = useState('')
 
-  const canCancel = profile?.role === 'caixa' || profile?.role === 'admin'
+  const canCancel = canCancelComanda(profile?.role)
 
   const comanda = comandas.find((c) => c.id === id)
   const stockItemMap = useMemo(
@@ -257,76 +252,6 @@ export default function ComandaDetail() {
     await changeQuantity(itemId, -item.quantity)
   }
 
-  async function cancelComanda() {
-    if (!comanda || saving) return
-    setSaving(true)
-    setError('')
-
-    try {
-      const comandaRef = doc(db, 'comandas', comanda.id)
-
-      await runTransaction(db, async (transaction) => {
-        const comandaSnap = await transaction.get(comandaRef)
-        if (comandaSnap.data()?.status !== 'open') {
-          throw new Error('Comanda não está aberta')
-        }
-        const items: ComandaItem[] = comandaSnap.data()?.items ?? []
-
-        // soma o consumo por item de estoque (vários produtos podem usar a mesma garrafa)
-        const toReturn = new Map<string, number>()
-        if (returnStock) {
-          for (const item of items) {
-            if (!item.stockItemId || item.consumptionPerUnit <= 0) continue
-            const qty = item.quantity * item.consumptionPerUnit
-            toReturn.set(item.stockItemId, (toReturn.get(item.stockItemId) ?? 0) + qty)
-          }
-        }
-
-        // transações exigem todas as leituras antes das escritas
-        const stockEntries = await Promise.all(
-          [...toReturn].map(async ([stockItemId, quantity]) => {
-            const ref = doc(db, 'stockItems', stockItemId)
-            const snap = await transaction.get(ref)
-            return { stockItemId, quantity, ref, snap }
-          })
-        )
-
-        for (const { stockItemId, quantity, ref, snap } of stockEntries) {
-          if (!snap.exists()) continue
-          const currentStock = snap.data()?.currentStock ?? 0
-          const newStock = currentStock + quantity
-          transaction.update(ref, { currentStock: newStock })
-          transaction.set(doc(collection(db, 'stockMovements')), {
-            stockItemId,
-            type: 'return',
-            quantity,
-            previousStock: currentStock,
-            newStock,
-            createdBy: profile?.uid ?? '',
-            createdAt: serverTimestamp(),
-            notes: `Comanda excluída: ${comanda.label}`,
-          })
-        }
-
-        transaction.update(comandaRef, {
-          status: 'cancelled',
-          cancelledBy: profile?.uid ?? '',
-          cancelledAt: serverTimestamp(),
-          cancelReason: cancelReason.trim(),
-          stockReturned: returnStock && toReturn.size > 0,
-        })
-      })
-
-      setCancelDialogOpen(false)
-      navigate('/')
-    } catch {
-      setError('Erro ao excluir a comanda. Tente novamente.')
-      setCancelDialogOpen(false)
-    } finally {
-      setSaving(false)
-    }
-  }
-
   function getStockWarning(product: Product): string | null {
     if (!product.stockItemId) return null
     const stock = stockItemMap[product.stockItemId]
@@ -480,11 +405,7 @@ export default function ComandaDetail() {
           color="error"
           fullWidth
           startIcon={<DeleteForever />}
-          onClick={() => {
-            setReturnStock(true)
-            setCancelReason('')
-            setCancelDialogOpen(true)
-          }}
+          onClick={() => setCancelDialogOpen(true)}
           sx={{ mt: 2, py: 1.5 }}
           disabled={saving}
         >
@@ -492,56 +413,11 @@ export default function ComandaDetail() {
         </Button>
       )}
 
-      <Dialog
-        open={cancelDialogOpen}
-        onClose={() => !saving && setCancelDialogOpen(false)}
-        fullWidth
-        maxWidth="xs"
-      >
-        <DialogTitle>Excluir comanda?</DialogTitle>
-        <DialogContent>
-          <DialogContentText sx={{ mb: 2 }}>
-            A comanda <strong>{comanda.label}</strong> ({formatCurrency(comanda.total)}) será
-            encerrada sem pagamento. Ela continua no Histórico marcada como Cancelada.
-          </DialogContentText>
-          {comanda.items.length > 0 && (
-            <>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={returnStock}
-                    onChange={(e) => setReturnStock(e.target.checked)}
-                  />
-                }
-                label="Devolver os itens ao estoque"
-              />
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2, ml: 4 }}>
-                Desmarque se os itens já foram consumidos (ex.: cliente saiu sem pagar).
-              </Typography>
-            </>
-          )}
-          <TextField
-            label="Motivo (opcional)"
-            fullWidth
-            value={cancelReason}
-            onChange={(e) => setCancelReason(e.target.value)}
-            placeholder="Ex: comanda aberta por engano"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setCancelDialogOpen(false)} disabled={saving}>
-            Voltar
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={cancelComanda}
-            disabled={saving}
-          >
-            Excluir Comanda
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <CancelComandaDialog
+        comanda={cancelDialogOpen ? comanda : null}
+        onClose={() => setCancelDialogOpen(false)}
+        onCancelled={() => navigate('/')}
+      />
 
       <Dialog
         open={addDialogOpen}

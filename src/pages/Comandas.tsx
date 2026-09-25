@@ -15,13 +15,15 @@ import {
   Button,
   Alert,
   Chip,
+  IconButton,
 } from '@mui/material'
-import { Add } from '@mui/icons-material'
+import { Add, DeleteOutline } from '@mui/icons-material'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { useAuth } from '../contexts/AuthContext'
 import { useCollection } from '../hooks/useFirestore'
 import { formatCurrency } from '../utils/format'
+import CancelComandaDialog, { canCancelComanda } from '../components/CancelComandaDialog'
 import type { Comanda } from '../types'
 
 export default function Comandas() {
@@ -32,6 +34,9 @@ export default function Comandas() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [label, setLabel] = useState('')
   const [saving, setSaving] = useState(false)
+  const [comandaToCancel, setComandaToCancel] = useState<Comanda | null>(null)
+
+  const canCancel = canCancelComanda(profile?.role)
 
   const openComandas = comandas.filter((c) => c.status === 'open')
 
@@ -76,13 +81,13 @@ export default function Comandas() {
           }}
         >
           {openComandas.map((comanda) => (
-            <Card key={comanda.id}>
+            <Card key={comanda.id} sx={{ position: 'relative' }}>
               <CardActionArea
                 onClick={() => navigate(`/comandas/${comanda.id}`)}
                 sx={{ p: 1 }}
               >
                 <CardContent>
-                  <Typography variant="h6" fontWeight={600}>
+                  <Typography variant="h6" fontWeight={600} sx={{ pr: canCancel ? 5 : 0 }}>
                     {comanda.label}
                   </Typography>
                   <Chip
@@ -96,6 +101,16 @@ export default function Comandas() {
                   </Typography>
                 </CardContent>
               </CardActionArea>
+              {canCancel && (
+                <IconButton
+                  aria-label={`Excluir comanda ${comanda.label}`}
+                  color="error"
+                  onClick={() => setComandaToCancel(comanda)}
+                  sx={{ position: 'absolute', top: 12, right: 12, width: 48, height: 48 }}
+                >
+                  <DeleteOutline />
+                </IconButton>
+              )}
             </Card>
           ))}
         </Box>
@@ -108,6 +123,11 @@ export default function Comandas() {
       >
         <Add />
       </Fab>
+
+      <CancelComandaDialog
+        comanda={comandaToCancel}
+        onClose={() => setComandaToCancel(null)}
+      />
 
       <Dialog
         open={dialogOpen}
