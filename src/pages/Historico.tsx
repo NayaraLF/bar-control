@@ -40,7 +40,7 @@ export default function Historico() {
   const [selectedComanda, setSelectedComanda] = useState<Comanda | null>(null)
 
   const closedComandas = comandas
-    .filter((c) => c.status === 'closed')
+    .filter((c) => c.status === 'closed' || c.status === 'cancelled')
     .reverse()
 
   if (loading) return <Typography sx={{ p: 2 }}>Carregando...</Typography>
@@ -80,9 +80,12 @@ export default function Historico() {
                     </Typography>
                   </Box>
                   <Typography variant="body2" color="text.secondary">
-                    {formatDate(comanda.closedAt)}
+                    {formatDate(comanda.status === 'cancelled' ? comanda.cancelledAt : comanda.closedAt)}
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 0.5, mt: 1, flexWrap: 'wrap' }}>
+                    {comanda.status === 'cancelled' && (
+                      <Chip label="Cancelada" size="small" color="error" />
+                    )}
                     {comanda.payments?.map((p, i) => (
                       <Chip
                         key={i}
@@ -110,7 +113,9 @@ export default function Historico() {
             <DialogTitle>
               {selectedComanda.label}
               <Typography variant="body2" color="text.secondary">
-                Fechada em {formatDate(selectedComanda.closedAt)}
+                {selectedComanda.status === 'cancelled'
+                  ? `Cancelada em ${formatDate(selectedComanda.cancelledAt)}`
+                  : `Fechada em ${formatDate(selectedComanda.closedAt)}`}
               </Typography>
             </DialogTitle>
             <DialogContent>
@@ -139,30 +144,42 @@ export default function Historico() {
 
               <Divider sx={{ my: 2 }} />
 
-              <Typography
-                variant="subtitle2"
-                color="text.secondary"
-                sx={{ mb: 1 }}
-              >
-                Pagamentos
-              </Typography>
-              <List dense disablePadding>
-                {selectedComanda.payments?.map((payment, index) => (
-                  <ListItem key={index}>
-                    <ListItemText
-                      primary={methodLabels[payment.method]}
-                      secondary={
-                        payment.change
-                          ? `Recebido: ${formatCurrency(payment.received!)} — Troco: ${formatCurrency(payment.change)}`
-                          : undefined
-                      }
-                    />
-                    <Typography fontWeight={600}>
-                      {formatCurrency(payment.amount)}
-                    </Typography>
-                  </ListItem>
-                ))}
-              </List>
+              {selectedComanda.status === 'cancelled' ? (
+                <Alert severity="error" sx={{ mb: 1 }}>
+                  Excluída sem pagamento.
+                  {selectedComanda.cancelReason && ` Motivo: ${selectedComanda.cancelReason}.`}
+                  {selectedComanda.stockReturned
+                    ? ' Itens devolvidos ao estoque.'
+                    : ' Itens não devolvidos ao estoque.'}
+                </Alert>
+              ) : (
+              <>
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
+                  Pagamentos
+                </Typography>
+                <List dense disablePadding>
+                  {selectedComanda.payments?.map((payment, index) => (
+                    <ListItem key={index}>
+                      <ListItemText
+                        primary={methodLabels[payment.method]}
+                        secondary={
+                          payment.change
+                            ? `Recebido: ${formatCurrency(payment.received!)} — Troco: ${formatCurrency(payment.change)}`
+                            : undefined
+                        }
+                      />
+                      <Typography fontWeight={600}>
+                        {formatCurrency(payment.amount)}
+                      </Typography>
+                    </ListItem>
+                  ))}
+                </List>
+              </>
+              )}
 
               <Divider sx={{ my: 2 }} />
 

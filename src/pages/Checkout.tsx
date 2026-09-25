@@ -70,7 +70,7 @@ export default function Checkout() {
   }, [splitMode, splitCount, comanda])
 
   if (loading) return <Typography sx={{ p: 2 }}>Carregando...</Typography>
-  if (!comanda || comanda.status === 'closed') {
+  if (!comanda || comanda.status !== 'open') {
     return (
       <Box sx={{ p: 2 }}>
         <Alert severity="error">Comanda não encontrada ou já fechada.</Alert>

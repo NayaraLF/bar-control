@@ -59,7 +59,7 @@ export interface Payment {
 export interface Comanda {
   id: string
   label: string
-  status: 'open' | 'closed'
+  status: 'open' | 'closed' | 'cancelled'
   items: ComandaItem[]
   total: number
   payments?: Payment[]
@@ -67,4 +67,8 @@ export interface Comanda {
   createdAt: Timestamp
   closedBy?: string
   closedAt?: Timestamp
+  cancelledBy?: string
+  cancelledAt?: Timestamp
+  cancelReason?: string
+  stockReturned?: boolean
 }
